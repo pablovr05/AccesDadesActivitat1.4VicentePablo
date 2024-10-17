@@ -2,12 +2,19 @@ package com.project.pr14;
 
 import com.project.objectes.Llibre;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonWriter;
+
 import java.io.File;
-import java.io.IOException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.List;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.lang.Exception;
 
 /**
  * Classe principal que gestiona la lectura i el processament de fitxers JSON per obtenir dades de llibres.
@@ -40,6 +47,7 @@ public class PR14GestioLlibreriaJacksonMain {
             modificarAnyPublicacio(llibres, 1, 1995);
             afegirNouLlibre(llibres, new Llibre(4, "Històries de la ciutat", "Miquel Soler", 2022));
             esborrarLlibre(llibres, 2);
+            System.out.println(llibres);
             guardarLlibres(llibres);
         }
     }
@@ -51,7 +59,27 @@ public class PR14GestioLlibreriaJacksonMain {
      */
     public List<Llibre> carregarLlibres() {
         // *************** CODI PRÀCTICA **********************/
-        return null; // Substitueix pel teu
+        List<Llibre> llibres = new ArrayList<>(); // Creamos una lista vacía de Llibres
+        try (JsonReader jsonReader = Json.createReader(new FileReader(dataFile))) {
+            // Leemos el archivo JSON y obtenemos directamente el JsonArray
+            JsonArray llibresArray = jsonReader.readArray();
+            // Recorremos el array de llibres y creamos objetos Llibre
+            for (int i = 0; i < llibresArray.size(); i++) {
+                JsonObject llibreObject = llibresArray.getJsonObject(i);
+                // Extraemos los campos del libro
+                int id = llibreObject.getInt("id");
+                String titol = llibreObject.getString("titol");
+                String autor = llibreObject.getString("autor");
+                int any = llibreObject.getInt("any");
+                // Creamos un nuevo objeto Llibre y lo añadimos a la lista
+                Llibre llibre = new Llibre(id, titol, autor, any);
+                llibres.add(llibre);
+            }
+        } catch (Exception e) {
+            System.out.println("Error al carregar llibres del fitxer JSON");
+            e.printStackTrace();
+        }
+        return llibres; // Devolvemos la lista de llibres
     }
 
     /**
@@ -63,6 +91,12 @@ public class PR14GestioLlibreriaJacksonMain {
      */
     public void modificarAnyPublicacio(List<Llibre> llibres, int id, int nouAny) {
         // *************** CODI PRÀCTICA **********************/
+        for (Llibre llibre : llibres) {
+            if (llibre.getId() == id) {
+                llibre.setAny(nouAny);
+                break;
+            }
+        }
     }
 
     /**
@@ -73,6 +107,7 @@ public class PR14GestioLlibreriaJacksonMain {
      */
     public void afegirNouLlibre(List<Llibre> llibres, Llibre nouLlibre) {
         // *************** CODI PRÀCTICA **********************/
+        llibres.add(nouLlibre);
     }
 
     /**
@@ -83,6 +118,12 @@ public class PR14GestioLlibreriaJacksonMain {
      */
     public void esborrarLlibre(List<Llibre> llibres, int id) {
         // *************** CODI PRÀCTICA **********************/
+        for (Llibre llibre : llibres) {
+            if (llibre.getId() == id) {
+                llibres.remove(llibre);
+                break;
+            }
+        }
     }
 
     /**
@@ -91,6 +132,26 @@ public class PR14GestioLlibreriaJacksonMain {
      * @param llibres Llista de llibres a guardar.
      */
     public void guardarLlibres(List<Llibre> llibres) {
-        // *************** CODI PRÀCTICA **********************/        
+        // *************** CODI PRÀCTICA **********************/´´
+
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+
+        for (Llibre llibre: llibres) {
+            JsonObject jsonObject = Json.createObjectBuilder()
+            .add("id", llibre.getId())
+            .add("titol", llibre.getTitol()) 
+            .add("autor", llibre.getAutor())
+            .add("any", llibre.getAny())
+            .build();
+
+            arrayBuilder.add(jsonObject);
+        } 
+        
+        try (JsonWriter jsonWriter = Json.createWriter(new FileWriter(new File(System.getProperty("user.dir"), "data/pr14" + File.separator + "llibres_input_jakarta.json")))) {
+            jsonWriter.writeArray(arrayBuilder.build());
+            System.out.println("JSON escrit correctament a " + "Jackson json");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

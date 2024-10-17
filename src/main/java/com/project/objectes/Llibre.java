@@ -38,4 +38,9 @@ public class Llibre {
     public void setAny(int any) {
         this.any = any;
     }
+
+    @Override
+    public String toString() {
+        return "Llibre amb ID: " + id + " Titol: " + titol + " Autor: " + autor + " Any: " + any;
+    }
 }
