@@ -14,7 +14,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.List;
 import java.util.ArrayList;
-import java.lang.Exception;
 
 /**
  * Classe principal que gestiona la lectura i el processament de fitxers JSON per obtenir dades de llibres.
@@ -48,7 +47,7 @@ public class PR14GestioLlibreriaJacksonMain {
             afegirNouLlibre(llibres, new Llibre(4, "Històries de la ciutat", "Miquel Soler", 2022));
             esborrarLlibre(llibres, 2);
             System.out.println(llibres);
-            guardarLlibres(llibres, dataFile);
+            guardarLlibres(llibres);
         }
     }
 
@@ -59,19 +58,15 @@ public class PR14GestioLlibreriaJacksonMain {
      */
     public List<Llibre> carregarLlibres() {
         // *************** CODI PRÀCTICA **********************/
-        List<Llibre> llibres = new ArrayList<>(); // Creamos una lista vacía de Llibres
+        List<Llibre> llibres = new ArrayList<>();
         try (JsonReader jsonReader = Json.createReader(new FileReader(dataFile))) {
-            // Leemos el archivo JSON y obtenemos directamente el JsonArray
             JsonArray llibresArray = jsonReader.readArray();
-            // Recorremos el array de llibres y creamos objetos Llibre
             for (int i = 0; i < llibresArray.size(); i++) {
                 JsonObject llibreObject = llibresArray.getJsonObject(i);
-                // Extraemos los campos del libro
                 int id = llibreObject.getInt("id");
                 String titol = llibreObject.getString("titol");
                 String autor = llibreObject.getString("autor");
                 int any = llibreObject.getInt("any");
-                // Creamos un nuevo objeto Llibre y lo añadimos a la lista
                 Llibre llibre = new Llibre(id, titol, autor, any);
                 llibres.add(llibre);
             }
@@ -79,7 +74,7 @@ public class PR14GestioLlibreriaJacksonMain {
             System.out.println("Error al carregar llibres del fitxer JSON");
             e.printStackTrace();
         }
-        return llibres; // Devolvemos la lista de llibres
+        return llibres;
     }
 
     /**
@@ -117,13 +112,7 @@ public class PR14GestioLlibreriaJacksonMain {
      * @param id Identificador del llibre a esborrar.
      */
     public void esborrarLlibre(List<Llibre> llibres, int id) {
-        // *************** CODI PRÀCTICA **********************/
-        for (Llibre llibre : llibres) {
-            if (llibre.getId() == id) {
-                llibres.remove(llibre);
-                break;
-            }
-        }
+        llibres.removeIf(llibre -> llibre.getId() == id);
     }
 
     /**
@@ -131,7 +120,8 @@ public class PR14GestioLlibreriaJacksonMain {
      *
      * @param llibres Llista de llibres a guardar.
      */
-    public void guardarLlibres(List<Llibre> llibres, File outputDirectory) {
+    public void guardarLlibres(List<Llibre> llibres) {
+        // *************** CODI PRÀCTICA **********************/
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         for (Llibre llibre : llibres) {
             JsonObject jsonObject = Json.createObjectBuilder()
@@ -142,8 +132,9 @@ public class PR14GestioLlibreriaJacksonMain {
                     .build();
             arrayBuilder.add(jsonObject);
         }
-        
-        File outputFile = new File(outputDirectory, "llibres_output_jackson.json");
+    
+        // Crear archivo de salida en el mismo directorio que el archivo de entrada temporal
+        File outputFile = new File(dataFile.getParent(), "llibres_output_jackson.json");
         try (JsonWriter jsonWriter = Json.createWriter(new FileWriter(outputFile))) {
             jsonWriter.writeArray(arrayBuilder.build());
             System.out.println("JSON escrit correctament a " + outputFile.getPath());

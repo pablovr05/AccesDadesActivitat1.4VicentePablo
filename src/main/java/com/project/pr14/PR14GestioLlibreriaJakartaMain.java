@@ -1,11 +1,7 @@
 package com.project.pr14;
 
-import jakarta.json.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -127,7 +123,7 @@ public class PR14GestioLlibreriaJakartaMain {
         ObjectMapper objectMapper = new ObjectMapper();
     
         // Crear un nou fitxer amb el nom especificat
-        File newFile = new File(System.getProperty("user.dir"), "data/pr14" + File.separator + "llibres_output_jakarta.json");;
+        File newFile = new File(dataFile.getParent(), "llibres_output_jakarta.json");
     
         try {
             // Escrivim la llista de llibres com a JSON al nou fitxer especificat
