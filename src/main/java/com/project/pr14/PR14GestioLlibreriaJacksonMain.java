@@ -48,7 +48,7 @@ public class PR14GestioLlibreriaJacksonMain {
             afegirNouLlibre(llibres, new Llibre(4, "Històries de la ciutat", "Miquel Soler", 2022));
             esborrarLlibre(llibres, 2);
             System.out.println(llibres);
-            guardarLlibres(llibres);
+            guardarLlibres(llibres, dataFile);
         }
     }
 
@@ -131,25 +131,22 @@ public class PR14GestioLlibreriaJacksonMain {
      *
      * @param llibres Llista de llibres a guardar.
      */
-    public void guardarLlibres(List<Llibre> llibres) {
-        // *************** CODI PRÀCTICA **********************/´´
-
+    public void guardarLlibres(List<Llibre> llibres, File outputDirectory) {
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-
-        for (Llibre llibre: llibres) {
+        for (Llibre llibre : llibres) {
             JsonObject jsonObject = Json.createObjectBuilder()
-            .add("id", llibre.getId())
-            .add("titol", llibre.getTitol()) 
-            .add("autor", llibre.getAutor())
-            .add("any", llibre.getAny())
-            .build();
-
+                    .add("id", llibre.getId())
+                    .add("titol", llibre.getTitol())
+                    .add("autor", llibre.getAutor())
+                    .add("any", llibre.getAny())
+                    .build();
             arrayBuilder.add(jsonObject);
-        } 
+        }
         
-        try (JsonWriter jsonWriter = Json.createWriter(new FileWriter(new File(System.getProperty("user.dir"), "data/pr14" + File.separator + "llibres_input_jakarta.json")))) {
+        File outputFile = new File(outputDirectory, "llibres_output_jackson.json");
+        try (JsonWriter jsonWriter = Json.createWriter(new FileWriter(outputFile))) {
             jsonWriter.writeArray(arrayBuilder.build());
-            System.out.println("JSON escrit correctament a " + "Jackson json");
+            System.out.println("JSON escrit correctament a " + outputFile.getPath());
         } catch (Exception e) {
             e.printStackTrace();
         }

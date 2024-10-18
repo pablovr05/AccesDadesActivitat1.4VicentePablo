@@ -123,16 +123,19 @@ public class PR14GestioLlibreriaJakartaMain {
      * @param llibres Llista de llibres a guardar.
      */
     public void guardarLlibres(List<Llibre> llibres) {
-        // *************** CODI PRÀCTICA **********************/
+        // Crear un ObjectMapper per a gestionar la serialització del JSON
         ObjectMapper objectMapper = new ObjectMapper();
+    
+        // Crear un nou fitxer amb el nom especificat
+        File newFile = new File(System.getProperty("user.dir"), "data/pr14" + File.separator + "llibres_output_jakarta.json");;
+    
         try {
-            File newFile = new File(System.getProperty("user.dir"), "data/pr14" + File.separator + "llibres_input_jackson.json");
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(dataFile, llibres);
+            // Escrivim la llista de llibres com a JSON al nou fitxer especificat
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(newFile, llibres);
             System.out.println("Llibres guardats correctament al fitxer " + newFile.getPath());
         } catch (IOException e) {
             System.out.println("Error en guardar els llibres al fitxer JSON");
             e.printStackTrace();
         }
-        
     }
 }
